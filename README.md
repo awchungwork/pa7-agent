@@ -267,6 +267,7 @@ Printing request_database:
 
 {'3th6rd': Request(user_request='can you give me a discount on Star Wars: Episode VI - Return of the Jedi?', user_name='')}
 ```
+Note that your ```request_database``` does not need to exactly match the example, but it should generally look the same (similar ```user_request```, and ```user_name``` should be empty or ```default_user```).
 
 ### Testing Your Code for Part 1
 
@@ -475,4 +476,5 @@ The python autograder will test and grade each function in the [rubric](https://
 
 * Rubric: https://docs.google.com/spreadsheets/d/1tYNSIUtir-gX2Q3sRqZaFc3ufVWdZbpRoUr1Lu_hIJI/edit?gid=1408405358#gid=1408405358
 * How the Autograder Works: https://docs.google.com/document/d/1LLEhSCbJ0y9mEi909QXMB7rQJr2eymk37Ts_DCiJUnI/edit?tab=t.0#heading=h.amfavasmxpg7
+
 
