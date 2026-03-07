@@ -239,7 +239,7 @@ Finally, 'reasoning' provides a summary of the task, and 'process_result' is the
 
 An important part of building a customer service agent is to be able to interface with databases to gather and record information about the user and the movies. As a starting point, implement the `book_ticket` tool in `agent.py` and integrate them into your agent.
 
-We have created a mini movie showtime database in `agent.py` that you can use to gather information about the movies and help with movie booking requests. When your agent booked a new ticket, make sure to update the `ticket_database` and deduct the ticket price from the user's balance. For any requests that can't be handled by your agent, make a human customer support request by calling the `file_request` tool to add the request to the `request_database`. Your should print the databases whenever you make new updates to them.
+We have created a mini movie showtime database in `agent.py` that you can use to gather information about the movies and help with movie booking requests. When your agent booked a new ticket, make sure to update the `ticket_database` and deduct the ticket price from the user's balance. For any requests that can't be handled by your agent, make a human customer support request by calling the `file_request` tool to add the request to the `request_database`. You can print the databases to confirm that they are accurate.
 
 Here is an example of what you should expect to see when you run the REPL:
 
@@ -476,6 +476,7 @@ The python autograder will test and grade each function in the [rubric](https://
 
 * Rubric: https://docs.google.com/spreadsheets/d/1tYNSIUtir-gX2Q3sRqZaFc3ufVWdZbpRoUr1Lu_hIJI/edit?gid=1408405358#gid=1408405358
 * How the Autograder Works: https://docs.google.com/document/d/1LLEhSCbJ0y9mEi909QXMB7rQJr2eymk37Ts_DCiJUnI/edit?tab=t.0#heading=h.amfavasmxpg7
+
 
 
 
