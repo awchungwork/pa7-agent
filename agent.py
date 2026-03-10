@@ -120,7 +120,11 @@ def similarity(u, v):
     ########################################################################
     # TODO: Compute cosine similarity between the two vectors.             #
     ########################################################################
-    similarity = 0
+    norm_u = np.linalg.norm(u)
+    norm_v = np.linalg.norm(v)
+    if norm_u == 0 or norm_v == 0:
+        return 0
+    similarity = np.dot(u, v) / (norm_u * norm_v)
     ########################################################################
     #                          END OF YOUR CODE                            #
     ########################################################################
@@ -151,9 +155,20 @@ def recommend_movies(user_name: str, k=3):
     # TODO: Implement collaborative filtering to generate a list of movie  #
     # indices to recommend to the user.                                    #
     ########################################################################
-    # Populate this list with k movie indices to recommend to the user.
-    recommendations = []
-    
+    user_ratings = np.array(user_ratings)
+    rated_indices = np.where(user_ratings != 0)[0]
+    unrated_indices = np.where(user_ratings == 0)[0]
+
+    if len(unrated_indices) == 0:
+        return []
+
+    scores = []
+    for i in unrated_indices:
+        score = sum(similarity(ratings_matrix[i], ratings_matrix[j]) * user_ratings[j] for j in rated_indices)
+        scores.append((i, score))
+
+    scores.sort(key=lambda x: x[1], reverse=True)
+    recommendations = [idx for idx, _ in scores[:k]]
     ########################################################################
     #                          END OF YOUR CODE                            #
     ########################################################################
@@ -236,12 +251,30 @@ def book_ticket(user_name: str, movie_title: str):
     #   customer support request by calling the `file_request` tool 
     #   to add the request to the `request_database`
     ########################################################################
-    ticket_number = '0'
-    user_balance = None
+    m = showtime_database.get(movie_title)
+    if not m:
+        return file_request(movie_title, user_name)
+
+    user_profile = user_database.get(user_name.lower())
+    if not user_profile:
+        return file_request(movie_title, user_name)
+
+    p = m.price
+    if user_profile.balance < p:
+        return f"insuff balance for booking tickets {movie_title}."
+
+    user_profile.balance -= p
+    t = _generate_id(length=6)
+    ticket_database[t] = Ticket(
+        user_name=user_name,
+        movie_title=movie_title,
+        time=m.start_time,
+    )
+    b = user_profile.balance
     ########################################################################
     #                          END OF YOUR CODE                            #
     ########################################################################
-    return f"Ticket booked successfully for {user_name} for the movie {movie_title}. The ticket number is {ticket_number}. Your new balance is {user_balance}."
+    return f"Ticket booked successfully for {user_name} for the movie {movie_title}. The ticket number is {t}. Your new balance is {b}."
 
 
 ## Integrating tools into an LLM agent: you will use the agent below for part 1
@@ -260,8 +293,13 @@ class MovieTicketAgent(dspy.Signature):
     # in order to successfully complete the tasks
     ########################################################################
     """
-    You are a movie ticket agent that helps user book and manage movie tickets. You are given a list of tools to handle user request, and you should decide the right tool to use in order to
-    fulfill users' request.  [TODO: add more details about the agent's objective and strategy here!]
+    You are a movie ticket agent that helps user book and manage movie tickets. You are given a list of tools to handle user request, and you should decide the right tool to use in order to fulfill users' request.
+    Call recommend_movies with name and the number of recommendations they want to recommend movies to users using collaborative filtering.
+    Call book_ticket with name and movie title to book tickets and you can check their balance with find_balance.
+    Call find_time to look up movie showtimes and call find_price to look up ticket prices.
+    Call general_qa for general questions you want to ask about the movies such as trivia or any summaries.
+    If you feel like the request cannot be solved using the available tools, file a customer support using file_request.
+    Once you finish the users request, don't make any additional tool calls.
     """
     ########################################################################
     #                          END OF YOUR CODE                            #
@@ -282,7 +320,11 @@ react_agent = dspy.ReAct(
         ########################################################################
         ## TODO: add other tools for your agent here
         ########################################################################
-
+        find_time,
+        find_price,
+        find_balance,
+        book_ticket,
+        file_request,
         ########################################################################
         #                          END OF YOUR CODE                            #
         ########################################################################
